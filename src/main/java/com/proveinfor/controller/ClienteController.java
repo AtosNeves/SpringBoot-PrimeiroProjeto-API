@@ -45,9 +45,40 @@ public class ClienteController {
     }
     return ResponseEntity.status(HttpStatus.OK).body(cliente.get());
 
-    
+
 }
 
+@PutMapping("/cliente/{id}")
+    public ResponseEntity<Object> atualizarCliente(@PathVariable(value = "id") UUID id,
+                                                    @RequestBody @Valid ClienteRecordDto clienteRecordDto){
+
+    Optional<ClienteModel> cliente = clienteRespository.findById(id);
+    if (cliente.isEmpty()){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cliente não encontrado");
+
+    }
+
+    ClienteModel clienteAtualizado = cliente.get();
+    BeanUtils.copyProperties(clienteRecordDto,clienteAtualizado);
+    return ResponseEntity.status(HttpStatus.OK).body(clienteRespository.save(clienteAtualizado));
+
+
+    }
+
+    @DeleteMapping("/cliente/{id}")
+    public ResponseEntity<Object> deleteCliente(@PathVariable(value = "id") UUID id){
+
+        Optional<ClienteModel> cliente = clienteRespository.findById(id);
+
+        if (cliente.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cliente não encontrado");
+        }
+
+        clienteRespository.delete(cliente.get());
+        return ResponseEntity.status(HttpStatus.OK).body("Cliente apagado");
+
+
+    }
 
 
 
